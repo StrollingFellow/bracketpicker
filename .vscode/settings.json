@@ -1,0 +1,4 @@
+{
+    "python.formatting.provider": "black",
+    "python.pythonPath": "/home/curtis/repos/fuckabilityPicker/fuckapicker/bin/python3.8"
+}
