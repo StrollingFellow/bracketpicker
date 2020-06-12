@@ -2,6 +2,7 @@
 import csv
 import argparse
 from typing import Dict
+from fuzzywuzzy import fuzz
 
 
 def get_args() -> Dict[str, str]:
@@ -24,7 +25,7 @@ class Character:
 
 
 def process_file() -> Dict[str, Character]:
-    with open("arknights.csv") as csvfile:
+    with open("idolmaster.csv") as csvfile:
         dictreader = csv.DictReader(csvfile)
         participantCount: int = len(
             dictreader.fieldnames[1 : dictreader.fieldnames.index("Average")]
@@ -41,11 +42,26 @@ def process_file() -> Dict[str, Character]:
         return characters
 
 
+def findChar(charName: str, characters: Dict[str, str]):
+    def bestFuzzy(name: str):
+        partial = fuzz.partial_ratio(charName, name)
+        if name.startswith(charName):
+            return partial + 50
+        return partial
+
+    keys = list(characters.keys())
+    keys.sort(reverse=True, key=bestFuzzy)
+    return keys[0]
+
+
 def main():
     characters = process_file()
     args = get_args()
-    char = characters[args["character"]]
-    char2 = characters[args["character2"]]
+    charGuess = findChar(args["character"], characters)
+    charGuess2 = findChar(args["character2"], characters)
+
+    char = characters[charGuess]
+    char2 = characters[charGuess2]
     combinedRatingArr = list()
     for i in range(len(char.ratingArr)):
         combinedRating = char2.ratingArr[i] - char.ratingArr[i]
